@@ -1,7 +1,7 @@
 {
   "name": "purine-query-desktop",
   "version": "1.0.0",
-  "description": "嘌呤无忧 - Windows 桌面版",
+  "description": "清透控酸 - Windows 桌面版",
   "main": "main.js",
   "author": "Purine Query",
   "license": "MIT",
@@ -17,7 +17,7 @@
   },
   "build": {
     "appId": "com.purinequery.desktop",
-    "productName": "嘌呤无忧",
+    "productName": "清透控酸",
     "directories": {
       "output": "dist"
     },
@@ -40,10 +40,10 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "嘌呤无忧"
+      "shortcutName": "清透控酸"
     },
     "portable": {
-      "artifactName": "嘌呤无忧-便携版-${version}.exe"
+      "artifactName": "清透控酸-便携版-${version}.exe"
     },
     "nsisWeb": {
     }

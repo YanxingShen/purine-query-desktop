@@ -1,5 +1,5 @@
 // ============================================================
-// 嘌呤无忧 - Electron 主进程
+// 清透控酸 - Electron 主进程
 // ============================================================
 'use strict';
 
@@ -14,7 +14,7 @@ function createWindow() {
     height: 750,
     minWidth: 800,
     minHeight: 600,
-    title: '嘌呤无忧 - 桌面版',
+    title: '清透控酸 - 桌面版',
     icon: path.join(__dirname, 'web', 'icons', 'icon-512.png'),
     autoHideMenuBar: false,
     webPreferences: {
@@ -70,7 +70,7 @@ function createWindow() {
             const v = app.getVersion();
             const el = mainWindow;
             if (el) el.webContents.executeJavaScript(
-              'alert("嘌呤无忧 桌面版\\n版本: ' + v + '\\n本地数据存储于应用目录。")'
+              'alert("清透控酸 桌面版\\n版本: ' + v + '\\n本地数据存储于应用目录。")'
             );
           }
         }
