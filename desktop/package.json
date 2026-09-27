@@ -1,0 +1,51 @@
+{
+  "name": "purine-query-desktop",
+  "version": "1.0.0",
+  "description": "嘌呤查询 - Windows 桌面版",
+  "main": "main.js",
+  "author": "Purine Query",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win --x64",
+    "dist:installer": "electron-builder --win nsis --x64",
+    "dist:portable": "electron-builder --win portable --x64"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.purinequery.desktop",
+    "productName": "嘌呤查询",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "package.json",
+      "web/**/*"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "web/icons/icon-512.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "嘌呤查询"
+    },
+    "portable": {
+      "artifactName": "嘌呤查询-便携版-${version}.exe"
+    },
+    "nsisWeb": {
+    }
+  }
+}
