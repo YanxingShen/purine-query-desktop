@@ -22,15 +22,16 @@
     <!-- ============ 查询（手机+桌面共用） ============ -->
     <section id="page-search" class="page active">
       <div class="search-box">
-        <input type="search" id="searchInput" placeholder="输入食物名、拼音或首字母，如 虾 / xia / x" autocomplete="off">
+        <svg class="search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="search" id="searchInput" placeholder="输入食物名、拼音或首字母" autocomplete="off">
       </div>
       <div class="chip-row" id="levelChips">
-        <button class="chip active" data-level="">全部</button>
-        <button class="chip lv-低" data-level="低">低</button>
-        <button class="chip lv-中" data-level="中">中</button>
-        <button class="chip lv-高" data-level="高">高</button>
-        <button class="chip lv-极高" data-level="极高">极高</button>
-        <button class="chip lv-未知" data-level="未知">未知</button>
+        <button class="chip active" data-level=""><span class="dot"></span>全部</button>
+        <button class="chip" data-level="低"><span class="dot"></span>低</button>
+        <button class="chip" data-level="中"><span class="dot"></span>中</button>
+        <button class="chip" data-level="高"><span class="dot"></span>高</button>
+        <button class="chip" data-level="极高"><span class="dot"></span>极高</button>
+        <button class="chip" data-level="未知"><span class="dot"></span>未知</button>
       </div>
       <details class="cat-filter" id="catFilter">
         <summary>选择大类筛选（点击展开）</summary>
@@ -142,7 +143,20 @@
       </div>
     </section>
 
-    <!-- ============ 工具（手机端：BMI + 尿酸目标） ============ -->
+    <!-- ============ 知识（手机端独立 Tab） ============ -->
+    <section id="page-kb" class="page">
+      <div class="search-box">
+        <svg class="search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="search" id="kbSearch" placeholder="搜索文章标题或内容…" autocomplete="off">
+      </div>
+      <div class="kb-filters">
+        <select id="kbCat" class="glass-select"></select>
+        <select id="kbSubcat" class="glass-select"></select>
+      </div>
+      <div id="kbBody"></div>
+    </section>
+
+    <!-- ============ 工具（手机端：BMI + 尿酸目标 + 预算 + 饮水量） ============ -->
     <section id="page-tools" class="page">
       <div class="tool-card">
         <h2>BMI 计算器</h2>
@@ -152,6 +166,38 @@
         </div>
         <button class="btn-primary" id="calcBmi">计算 BMI</button>
         <div class="tool-result" id="bmiResult"></div>
+      </div>
+
+      <div class="tool-card">
+        <h2>每日嘌呤预算估算</h2>
+        <p class="tip-text">根据体重估算每日建议嘌呤摄入量（参考食养指南），记食页会按预算显示进度。</p>
+        <div class="form-row">
+          <label>体重 (kg)<input type="number" id="budgetWeight" placeholder="如 65"></label>
+        </div>
+        <button class="btn-primary" id="calcBudget">计算建议预算</button>
+        <div class="tool-result" id="budgetResult"></div>
+      </div>
+
+      <div class="tool-card">
+        <h2>每日饮水量推荐</h2>
+        <p class="tip-text">按体重 30–35 ml/kg 计算，痛风患者建议 ≥2000 ml。可一键设为"记录"页今日饮水目标。</p>
+        <div class="form-row">
+          <label>体重 (kg)<input type="number" id="waterCalcWeight" placeholder="如 65"></label>
+        </div>
+        <button class="btn-primary" id="calcWater">计算推荐饮水量</button>
+        <div class="tool-result" id="waterCalcResult"></div>
+        <button class="btn-ghost full" id="setWaterGoal" style="margin-top:8px">设为今日饮水目标</button>
+      </div>
+
+      <div class="tool-card">
+        <h2>嘌呤等级速查</h2>
+        <ul class="plain-list">
+          <li><span class="f-tag tag-低">低</span> &lt;75 mg/100g：可正常食用（奶、蛋、大部分蔬果、精米白面）</li>
+          <li><span class="f-tag tag-中">中</span> 75–150 mg/100g：适量（畜禽肉、部分鱼类、豆类）</li>
+          <li><span class="f-tag tag-高">高</span> 150–300 mg/100g：少吃（部分鱼类、浓肉汤）</li>
+          <li><span class="f-tag tag-极高">极高</span> &gt;300 mg/100g：避免（动物内脏、沙丁鱼、凤尾鱼、贝类）</li>
+        </ul>
+        <p class="tip-text">急性期建议严格控制在 150 mg/d 以内，缓解期可放宽至 400 mg/d。</p>
       </div>
 
       <div class="tool-card">
@@ -184,16 +230,18 @@
       </div>
 
       <div class="tool-card">
-        <h2>通道② · 密钥 / 扫码更新</h2>
-        <p class="tip-text">官方发放一次性密钥或二维码，扫码后需联网从地址下载更新包。二维码只承载地址+签名，不承载数据。</p>
-        <textarea id="updateKey" rows="2" placeholder="PUR-xxxx..."></textarea>
+        <h2>通道② · 更新码 / 扫码更新</h2>
+        <p class="tip-text">官方发布的 16 位更新码，扫码或输入后联网校验并下载更新。</p>
+        <input type="text" id="shortCodeInput" placeholder="XXXX-XXXX-XXXX-XXXX" maxlength="19" autocomplete="off" style="width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:18px;letter-spacing:2px;text-transform:uppercase">
         <div class="btn-row">
           <button class="btn-primary" id="applyKey">更新</button>
           <button class="btn-ghost" id="scanKey">扫码更新</button>
         </div>
+
+        <div id="updateResult"></div>
         <!-- 扫码弹窗 -->
         <div id="scannerBox" style="display:none;margin-top:10px">
-          <video id="qrVideo" style="width:100%;border-radius:8px"></video>
+          <video id="qrVideo" autoplay playsinline muted webkit-playsinline x5-playsinline style="width:100%;border-radius:8px"></video>
           <div class="btn-row">
             <button class="btn-ghost" id="stopScan">停止扫描</button>
             <label class="btn-ghost" style="text-align:center;cursor:pointer">选择二维码图片
@@ -204,16 +252,16 @@
       </div>
 
       <div class="tool-card">
-        <h2>通道③ · 离线包导入</h2>
-        <p class="tip-text">完全无网络时使用。离线包密钥内含 gzip 压缩的完整数据库，密钥极长（约 20 万字符），仅适合复制粘贴。</p>
-        <p class="tip-text">方式一：选择离线更新包 JSON 文件：</p>
+        <h2>通道③ · 离线自包含包</h2>
+        <p class="tip-text">完全无网络时使用。离线包密钥内含 gzip 压缩的完整数据库，无需联网即可更新数据，密钥较长适合复制粘贴。</p>
+        <p class="tip-text" style="color:#e07b24">注意：离线包仅包含数据库数据，无法更新 UI 界面代码。如需更新界面，请联网使用通道①自动更新或通道②"完整升级"密钥。</p>
+        <p class="tip-text">方式一：粘贴 PUR- 离线包密钥（自动识别 data 字段）：</p>
+        <textarea id="updateKey" rows="3" placeholder="PUR-xxxx...（离线自包含包）" style="width:100%;padding:12px;border:1.5px solid var(--line-soft);border-radius:12px;font-size:13px;background:rgba(255,255,255,0.6)"></textarea>
+        <div class="btn-row">
+          <button class="btn-primary" id="applyOfflineKey">应用离线包</button>
+        </div>
+        <p class="tip-text" style="margin-top:12px">方式二：选择离线更新包 JSON 文件：</p>
         <input type="file" id="offlineFile" accept="application/json,.json">
-        <p class="tip-text" style="margin-top:8px">方式二：在上方密钥框粘贴超长 PUR- 离线包密钥后点"更新"（自动识别 data 字段）。</p>
-      </div>
-
-      <div class="tool-card">
-        <h2>痛风知识库</h2>
-        <div id="knowledgeCards" class="kb-cards"></div>
       </div>
 
       <div class="tool-card">
@@ -286,17 +334,25 @@
         <h2>嘌呤数据库更新密钥生成器</h2>
         <p class="tip-text">此工具用于官方签发更新密钥。生成 <code>PUR-</code> 开头密钥，手机端输入或扫码即可更新数据库。</p>
         <div class="seg-tabs" id="kgMode">
-          <button class="seg active" data-mode="online">通道② 在线密钥</button>
-          <button class="seg" data-mode="offline">通道③ 离线包</button>
+          <button class="seg active" data-mode="short">短码（推荐）</button>
+          <button class="seg" data-mode="online">长码/在线</button>
+          <button class="seg" data-mode="offline">离线包</button>
         </div>
         <div class="form-row">
-          <label id="kgUrlLabel">下载地址 URL（新数据库 JSON 静态托管地址）
+          <label>升级类型
+            <select id="kgType">
+              <option value="data">仅数据更新（type=data）</option>
+              <option value="full">完整升级：数据 + UI 代码（type=full）</option>
+            </select>
+          </label>
+          <label id="kgUrlLabel">下载地址 URL
             <input type="url" id="kgUrl" placeholder="https://example.com/purine-db-v1.1.0.json">
           </label>
           <label>过期日期 <input type="date" id="kgExp"></label>
           <label>更新说明（可选） <input type="text" id="kgNotes" placeholder="如：v1.1.0 新增 50 条水产类数据"></label>
         </div>
         <p class="tip-text" id="kgModeHint" style="color:#2e7d5b">在线模式：密钥含下载地址，手机端扫码后需联网拉取更新包。</p>
+        <p class="tip-text" id="kgTypeHint" style="color:#1a5c3e"></p>
         <div class="kg-meta" id="kgMeta"></div>
         <button class="btn-primary full" id="genKey">生成更新密钥</button>
       </div>
@@ -305,7 +361,8 @@
         <p class="tip-text">此密钥为官方更新密钥，发布后供手机端用户输入或扫码更新数据库。</p>
         <textarea id="kgOutput" rows="4" readonly></textarea>
         <div class="btn-row">
-          <button class="btn-primary" id="copyKey">复制密钥</button>
+          <button class="btn-primary" id="copyKey">复制密钥/码</button>
+          <button class="btn-ghost" id="exportIndex">导出索引文件</button>
           <button class="btn-ghost" id="genQr">生成二维码</button>
           <button class="btn-ghost" id="clearKey">清空</button>
         </div>
@@ -365,6 +422,7 @@
       <div class="modal-body">
         <p id="aContent" class="article-content"></p>
         <div id="aSources" class="article-sources"></div>
+        <div class="article-disclaimer">本文为健康科普，仅供参考，不替代医生面诊，具体诊断与治疗请由相应专科医生决定。</div>
       </div>
     </div>
   </div>

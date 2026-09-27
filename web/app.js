@@ -5,6 +5,9 @@
  * ============================================================ */
 'use strict';
 
+/* 应用版本（与数据版本分开） */
+const APP_VERSION = '1.0.5';
+
 /* ---------------- 0. 环境检测 ---------------- */
 const IS_DESKTOP = (function () {
   try {
@@ -13,6 +16,19 @@ const IS_DESKTOP = (function () {
   } catch (e) {}
   return false;
 })();
+
+/* 内联 SVG 线性图标（stroke 风格，currentColor，24x24） */
+const ICONS = {
+  search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>',
+  log: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11h18l-1.5 9h-15z"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
+  records: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.7l4.9 4.9a7 7 0 1 1-9.8 0z"/></svg>',
+  tools: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 12h2M14 12h2M8 16h2M14 16h2"/></svg>',
+  me: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>',
+  admin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5"/><path d="M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/></svg>',
+  keygen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 8.3-8.3M17 5l3 3M14 8l2 2"/></svg>',
+  book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5v13z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>',
+  empty: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3M8 11h6"/></svg>'
+};
 
 /* ---------------- 1. 本地存储工具 ---------------- */
 const LS = {
@@ -68,16 +84,17 @@ function cmpVer(a, b) {
 
 /* ---------------- 4. 底部 Tab 渲染（按模式） ---------------- */
 const TABS_MOBILE = [
-  { id: 'search', ico: '🔍', label: '查询' },
-  { id: 'log',    ico: '🍽️', label: '记食' },
-  { id: 'records',ico: '📊', label: '记录' },
-  { id: 'tools',  ico: '🛠️', label: '工具' },
-  { id: 'me',     ico: '👤', label: '我的' }
+  { id: 'search',  ico: 'search',  label: '查询' },
+  { id: 'log',     ico: 'log',     label: '记食' },
+  { id: 'records', ico: 'records', label: '记录' },
+  { id: 'kb',      ico: 'book',    label: '知识' },
+  { id: 'tools',   ico: 'tools',   label: '工具' },
+  { id: 'me',      ico: 'me',      label: '我的' }
 ];
 const TABS_DESKTOP = [
-  { id: 'search', ico: '🔍', label: '嘌呤查询' },
-  { id: 'admin',   ico: '🗃️', label: '数据管理' },
-  { id: 'keygen',  ico: '🔑', label: '密钥生成器' }
+  { id: 'search', ico: 'search', label: '嘌呤查询' },
+  { id: 'admin',   ico: 'admin',  label: '数据管理' },
+  { id: 'keygen',  ico: 'keygen', label: '密钥生成器' }
 ];
 
 function renderTabs() {
@@ -85,14 +102,12 @@ function renderTabs() {
   const bar = $('#tabbar');
   bar.innerHTML = tabs.map((t, i) =>
     '<button class="tab' + (i === 0 ? ' active' : '') + '" data-tab="' + t.id + '">' +
-    '<span class="tab-ico">' + t.ico + '</span><span>' + t.label + '</span></button>'
+    (ICONS[t.ico] || '') + '<span>' + t.label + '</span></button>'
   ).join('');
-  // 手机端专属页面：桌面模式隐藏
-  ['page-log', 'page-records', 'page-tools', 'page-me'].forEach(id => {
+  ['page-log', 'page-records', 'page-kb', 'page-tools', 'page-me'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = IS_DESKTOP ? 'none' : '';
   });
-  // 桌面专属页面：手机模式隐藏
   ['page-admin', 'page-keygen'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = IS_DESKTOP ? '' : 'none';
@@ -103,18 +118,18 @@ function renderTabs() {
 function switchTab(tabId) {
   $all('.tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
   $all('.page').forEach(p => {
-    const mobileOnly = ['page-log', 'page-records', 'page-tools', 'page-me'].includes(p.id);
+    const mobileOnly = ['page-log', 'page-records', 'page-kb', 'page-tools', 'page-me'].includes(p.id);
     const desktopOnly = ['page-admin', 'page-keygen'].includes(p.id);
     let show = p.id === 'page-' + tabId;
     if (IS_DESKTOP && mobileOnly) show = false;
     if (!IS_DESKTOP && desktopOnly) show = false;
     p.classList.toggle('active', show);
   });
-  const titles = { search: '嘌呤查询', log: '每日记食', records: '健康记录', tools: '健康工具', me: '我的', keygen: '密钥生成器', admin: '数据管理' };
+  const titles = { search: '嘌呤查询', log: '每日记食', records: '健康记录', kb: '健康知识', tools: '健康工具', me: '我的', keygen: '密钥生成器', admin: '数据管理' };
   $('#appTitle').textContent = titles[tabId] || '嘌呤查询';
   window.scrollTo(0, 0);
-  // 切到数据管理时渲染列表
   if (tabId === 'admin') renderAdminList();
+  if (tabId === 'kb') renderKbPage();
 }
 
 /* ---------------- 6. 搜索（中文 + 拼音 + 首字母，带排序） ---------------- */
@@ -172,7 +187,7 @@ let curFilterCat = '';
 function renderFoodItem(item, showCat) {
   const v = item.purine_mg_per_100g;
   const valStr = v == null ? '未知' : (v + ' mg');
-  return '<li data-id="' + item.id + '">' +
+  return '<li data-id="' + item.id + '" class="lv-' + (item.level || '未知') + '">' +
     '<div><div class="f-name">' + escapeHtml(item.name) + '</div>' +
     '<div class="f-meta">' + escapeHtml(showCat ? item.category : (item.subcategory || item.category)) +
     (item.aliases && item.aliases.length ? ' · 别名：' + escapeHtml(item.aliases.join('、')) : '') + '</div></div>' +
@@ -224,20 +239,18 @@ function openDetail(item) {
   $('#dName').textContent = item.name;
   const v = item.purine_mg_per_100g;
   const range = item.purine_range;
-  const rangeStr = range && range.length === 2 ? ('（参考范围 ' + range[0] + '–' + range[1] + ' mg/100g）') : '';
   $('#dBody').innerHTML =
-    '<div class="detail-row"><span class="k">嘌呤含量</span><span class="big-val">' +
-    (v == null ? '未知' : v) + ' <small>mg/100g' + (v == null ? '' : '）') + '</small></span></div>' +
-    (rangeStr ? '<div class="detail-row"><span class="k">范围</span>' + rangeStr + '</div>' : '') +
-    '<div class="detail-row"><span class="k">等级</span>' + levelTag(item.level) + '</div>' +
-    '<div class="detail-row"><span class="k">大类</span>' + escapeHtml(item.category) +
-    (item.subcategory ? ' / ' + escapeHtml(item.subcategory) : '') + '</div>' +
+    '<div class="detail-title-row"><h3>' + escapeHtml(item.name) + '</h3>' + levelTag(item.level) + '</div>' +
+    '<div class="detail-big-val">' + (v == null ? '未知' : v) + ' <small>mg/100g</small></div>' +
+    (range && range.length === 2 ? '<div class="detail-row"><span class="k">参考范围</span>' + range[0] + '–' + range[1] + ' mg/100g</div>' : '') +
+    '<div class="detail-section"><h4>基本信息</h4>' +
+    '<div class="detail-row"><span class="k">大类</span>' + escapeHtml(item.category) + (item.subcategory ? ' / ' + escapeHtml(item.subcategory) : '') + '</div>' +
     (item.aliases && item.aliases.length ? '<div class="detail-row"><span class="k">别名</span>' + escapeHtml(item.aliases.join('、')) + '</div>' : '') +
     (item.preparation ? '<div class="detail-row"><span class="k">食用状态</span>' + escapeHtml(item.preparation) + '</div>' : '') +
     (item.note ? '<div class="detail-row"><span class="k">备注</span>' + escapeHtml(item.note) + '</div>' : '') +
-    '<div class="detail-row"><span class="k">来源</span><ul class="sources-list">' +
+    '</div>' +
+    '<div class="detail-section"><h4>来源</h4><ul class="sources-list">' +
     (item.sources || []).map(s => '<li>' + escapeHtml(s) + '</li>').join('') + '</ul></div>';
-  // 桌面模式不显示"加入今日饮食"
   $('#dFoot').style.display = IS_DESKTOP ? 'none' : '';
   openModal('detailModal');
 }
@@ -329,7 +342,7 @@ function drawWaterChart() {
   const cw = (W - padL - padR) / days.length;
 
   // Y 轴刻度
-  ctx.strokeStyle = '#e3ece7'; ctx.fillStyle = '#999'; ctx.font = '11px sans-serif';
+  ctx.strokeStyle = '#e3ece7'; ctx.fillStyle = '#999'; ctx.font = '12px sans-serif';
   for (let i = 0; i <= 4; i++) {
     const y = padT + (H - padT - padB) * i / 4;
     ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
@@ -343,7 +356,7 @@ function drawWaterChart() {
     const y = H - padB - bh;
     ctx.fillStyle = d.val >= goal ? '#2e7d5b' : '#7fc4a3';
     ctx.fillRect(x, y, bw, bh);
-    ctx.fillStyle = '#667'; ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillStyle = '#667'; ctx.font = '12px sans-serif'; ctx.textAlign = 'center';
     ctx.fillText(d.label, x + bw / 2, H - 8);
     if (d.val > 0) { ctx.fillStyle = '#345'; ctx.fillText(d.val + '', x + bw / 2, y - 4); }
   });
@@ -393,7 +406,7 @@ function drawUricChart() {
   minV = Math.floor((minV - 20) / 50) * 50; maxV = Math.ceil((maxV + 20) / 50) * 50;
 
   // 网格 + Y 轴
-  ctx.strokeStyle = '#e3ece7'; ctx.fillStyle = '#999'; ctx.font = '11px sans-serif';
+  ctx.strokeStyle = '#e3ece7'; ctx.fillStyle = '#999'; ctx.font = '12px sans-serif';
   for (let i = 0; i <= 4; i++) {
     const v = minV + (maxV - minV) * i / 4;
     const y = padT + plotH - (v - minV) / (maxV - minV) * plotH;
@@ -457,35 +470,126 @@ function calcBMI() {
   $('#bmiResult').innerHTML = '<b>BMI = ' + bmi.toFixed(1) + '</b>（' + cat + '）<br><span class="tip-text">' + tip + '</span>';
 }
 
-/* ---------------- 15. 数据库信息 / 知识库 / 免责声明 ---------------- */
+/* ---------------- 14b. 嘌呤预算计算器 ---------------- */
+function calcBudget() {
+  const w = parseFloat($('#budgetWeight').value);
+  if (!w || w <= 0) { $('#budgetResult').innerHTML = '<span style="color:#c62828">请输入有效体重</span>'; return; }
+  const acute = 150, remission = 400;
+  // 按体重微调：参考指南，体重越大代谢负担略增，但急性/缓解期区间为主
+  $('#budgetResult').innerHTML =
+    '<div style="margin-bottom:6px">当前体重 <b>' + w + ' kg</b></div>' +
+    '<div>急性期每日建议：<b style="color:#c62828"><150 mg</b></div>' +
+    '<div>缓解期每日建议：<b style="color:#2e7d5b"><400 mg</b></div>' +
+    '<div style="margin-top:8px;font-size:13px;color:#5a6b63">三餐分配参考：早餐约 20%、午餐约 40%、晚餐约 40%。优先选低嘌呤食物，避免集中一餐超标。</div>';
+}
+
+/* ---------------- 14c. 饮水量计算器 ---------------- */
+function calcWater() {
+  const w = parseFloat($('#waterCalcWeight').value);
+  if (!w || w <= 0) { $('#waterCalcResult').innerHTML = '<span style="color:#c62828">请输入有效体重</span>'; return; }
+  const low = Math.round(w * 30), high = Math.round(w * 35);
+  const rec = Math.max(2000, Math.round((low + high) / 2));
+  $('#waterCalcResult').innerHTML =
+    '<div>按体重 <b>' + w + ' kg</b>，每日推荐 <b style="color:#2e7d5b">' + low + '–' + high + ' ml</b></div>' +
+    '<div style="margin-top:6px">痛风患者建议至少 <b>2000 ml</b>，推荐目标 <b style="color:#2e7d5b">' + rec + ' ml</b>。</div>' +
+    '<div style="margin-top:6px;font-size:13px;color:#5a6b63">分次建议：早起 300ml、上午 500ml、午餐前后 400ml、下午 500ml、晚餐前后 400ml、睡前 200ml（少量多次）。</div>';
+  // 一键设为今日目标
+  $('#setWaterGoal').onclick = () => { LS.set('water_goal', rec); renderWater(); alert('已将今日饮水目标设为 ' + rec + ' ml'); };
+}
+
+/* ---------------- 15. 知识库 Tab ---------------- */
+let kbCat = '-1';      // 一级大类，-1=全部
+let kbSubcat = '-1';   // 二级小类，-1=全部
+
+// 汇总所有文章的 cat/subcat
+function kbBuildTree() {
+  const map = new Map(); // cat -> Set(subcat)
+  const all = [];
+  (KNOWLEDGE.sections || []).forEach((s, si) => {
+    (s.articles || []).forEach((a, ai) => {
+      const cat = a.cat || '未分类';
+      const sub = a.subcat || '未分类';
+      if (!map.has(cat)) map.set(cat, new Set());
+      map.get(cat).add(sub);
+      all.push({ s, si, a, ai, cat, sub });
+    });
+  });
+  return { map, all };
+}
+
+function renderKbPage() {
+  const q = ($('#kbSearch').value || '').trim().toLowerCase();
+  const { map, all } = kbBuildTree();
+  // 填充大类下拉
+  const catSel = $('#kbCat');
+  const cats = [...map.keys()].sort((a,b)=>a.localeCompare(b,'zh'));
+  if (catSel.options.length !== cats.length + 1) {
+    catSel.innerHTML = '<option value="-1">全部大类</option>' +
+      cats.map(c => '<option value="' + escapeHtml(c) + '">' + escapeHtml(c) + '</option>').join('');
+  }
+  catSel.value = kbCat;
+  // 填充小类下拉（联动）
+  const subSel = $('#kbSubcat');
+  const subCats = kbCat === '-1' ? [...new Set(all.map(x=>x.sub))].sort((a,b)=>a.localeCompare(b,'zh'))
+                                 : [...(map.get(kbCat) || [])].sort((a,b)=>a.localeCompare(b,'zh'));
+  subSel.innerHTML = '<option value="-1">全部小类</option>' +
+    subCats.map(s => '<option value="' + escapeHtml(s) + '">' + escapeHtml(s) + '</option>').join('');
+  subSel.value = kbSubcat;
+  // 过滤
+  let filtered = all.filter(x => (kbCat === '-1' || x.cat === kbCat) && (kbSubcat === '-1' || x.sub === kbSubcat));
+  if (q) filtered = filtered.filter(x => (x.a.title||'').toLowerCase().includes(q) || (x.a.content||'').toLowerCase().includes(q));
+  if (!filtered.length) {
+    $('#kbBody').innerHTML = '<div class="empty-state">' + ICONS.empty + '<div class="t">未找到相关文章</div></div>';
+    return;
+  }
+  // 渲染：按板块分组
+  const bySec = {};
+  filtered.forEach(x => { (bySec[x.si] = bySec[x.si] || []).push(x); });
+  $('#kbBody').innerHTML = Object.keys(bySec).sort((a,b)=>a-b).map(si => {
+    const list = bySec[si];
+    const s = list[0].s;
+    return '<details class="cat-group" open><summary>' + escapeHtml(s.title) +
+      '<span class="cat-count">' + list.length + ' 篇</span></summary><ul class="food-list">' +
+      list.map(x => '<li data-article="' + x.si + ':' + x.ai + '" style="cursor:pointer">' +
+        '<div><div class="f-name">' + escapeHtml(x.a.title) + '</div>' +
+        '<div class="f-meta">' + escapeHtml((x.a.content||'').slice(0,40)) + '…</div></div></li>').join('') +
+      '</ul></details>';
+  }).join('');
+}
+
+function openArticle(si, ai) {
+  const sec = KNOWLEDGE.sections[si]; if (!sec) return;
+  const art = sec.articles[ai]; if (!art) return;
+  $('#aTitle').textContent = art.title;
+  // 正文按段落换行
+  $('#aContent').innerHTML = (art.content || '').split(/\n+/).filter(p => p.trim()).map(p => '<p>' + escapeHtml(p.trim()) + '</p>').join('');
+  $('#aSources').innerHTML = '参考来源：<ul class="sources-list">' + (art.sources || []).map(s => '<li>' + escapeHtml(s) + '</li>').join('') + '</ul>';
+  openModal('articleModal');
+}
+
+/* ---------------- 15. 数据库信息 / 免责声明 ---------------- */
 function renderMe() {
-  // 数据库信息
   $('#dbInfo').innerHTML =
-    '<li>当前版本：<b>' + escapeHtml(DB.db_version) + '</b>' +
+    '<li>应用版本：<b>v' + escapeHtml(APP_VERSION) + '</b></li>' +
+    '<li>数据版本：<b>v' + escapeHtml(DB.db_version) + '</b>' +
     (LS.get('db_override', null) ? ' <span style="color:#e07b24">(本地已更新)</span>' : '') + '</li>' +
-    '<li>更新日期：' + escapeHtml(DB.updated || '') + '</li>' +
+    '<li>数据更新日期：' + escapeHtml(DB.updated || '') + '</li>' +
     '<li>条目数：' + DB.items.length + ' 条</li>' +
     '<li>覆盖大类：' + DB.categories.length + ' 个</li>';
-  // 通道①信息
   $('#channel1Info').innerHTML =
-    '<li>当前版本：v' + escapeHtml(DB.db_version) + '（' + DB.items.length + ' 条）</li>' +
+    '<li>数据版本：v' + escapeHtml(DB.db_version) + '（' + DB.items.length + ' 条）</li>' +
+    '<li>应用版本：v' + escapeHtml(APP_VERSION) + '</li>' +
     '<li>托管地址：' + (LS.get('host_url', '') || '未配置') + '</li>';
   $('#hostUrl').value = LS.get('host_url', '');
-  // 免责声明
   $('#disclaimerText').textContent = KNOWLEDGE.disclaimer || '';
-  // 诚实性总声明
   $('#honestyList').innerHTML = [
     '本软件仅供健康参考，不替代专业医疗诊断与治疗建议。',
     '通道①自动更新需将应用部署在公网 HTTPS 静态地址，未部署时仅能使用本地数据。',
-    '通道②二维码只承载地址+签名，不承载数据，扫码后需联网下载。',
-    '通道③离线包密钥极长，仅适合无网络兜底，不建议日常使用。',
+    '通道②二维码只承载地址+签名，不承载数据，扫码后需联网下载；type=full 时会同时更新 UI 代码。',
+    '通道③离线包密钥极长，仅适合无网络兜底，且仅更新数据、不更新 UI。',
     '密钥验证为本地格式+哈希校验，非银行级安全机制。',
     '嘌呤数据来源于国家卫健委《成人高尿酸血症与痛风食养指南(2024年版)》等公开资料。'
   ].map(t => '<li>' + t + '</li>').join('');
-  // 知识库卡片
-  $('#knowledgeCards').innerHTML = (KNOWLEDGE.sections || []).map((s, i) =>
-    '<div class="kb-card" data-s="' + i + '"><div class="ico">' + (s.icon || '📘') + '</div><div class="t">' + escapeHtml(s.title) + '</div></div>'
-  ).join('');
 }
 
 /* ---------------- 16. 更新密钥：解码 + 校验 + 下载 + 校验 + 写入 ---------------- */
@@ -502,6 +606,99 @@ function b64urlEncode(bytes) {
   bytes.forEach(b => bin += String.fromCharCode(b));
   return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
+/* 安全相关常量（必须与 scripts/generate_update_key.py 完全一致） */
+const PURINE_MAC_SALT = 'purine-app-v1-mac-salt-2026';
+
+/* 规范 JSON 序列化：键排序、无空格、非 ASCII 保留原文（对应 Python ensure_ascii=False） */
+function canonicalJson(obj) {
+  const keys = Object.keys(obj).sort();
+  const parts = keys.map(k => {
+    const v = obj[k];
+    let vs;
+    if (typeof v === 'string') vs = '"' + v.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"';
+    else vs = JSON.stringify(v);
+    return JSON.stringify(k) + ':' + vs;
+  });
+  return '{' + parts.join(',') + '}';
+}
+
+/* 字节数组转 hex */
+function bufToHex(buf) {
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+/* 短码字母表（32 字母表，剔除 0/O/1/I） */
+const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+/* 规范化用户输入：转大写、去非字母表字符；返回 {mode, code} */
+function normalizeInput(raw) {
+  raw = (raw || '').trim();
+  if (raw.toUpperCase().startsWith('PUR-') && raw.length > 20) return { mode: 'long', code: raw };
+  // 短码：保留字母表内字符（大小写不敏感）
+  const up = raw.toUpperCase();
+  let code = '';
+  for (const ch of up) if (CODE_ALPHABET.includes(ch)) code += ch;
+  if (code.length >= 8) return { mode: 'short', code: code.slice(0, 16) };
+  return { mode: 'unknown', code: raw };
+}
+
+/* 由码算索引文件名：sha256(码大写)[:16] hex */
+async function codeHashPrefix(code) {
+  const buf = await sha256Bytes(new TextEncoder().encode(code.toUpperCase()));
+  return bufToHex(buf).slice(0, 16);
+}
+
+/* 取应用部署基地址（去掉 index.html 和尾部斜杠） */
+function appBase() {
+  let b = location.origin + location.pathname;
+  b = b.replace(/\/index\.html.*$/, '/').replace(/\/$/, '');
+  return b;
+}
+
+/* 两级 HMAC-SHA256：mac = HMAC(K, HMAC(K, canonical(no-mac)) + '|' + code)，K=sha256(盐) */
+async function computeMac(tokenWithoutMac, code) {
+  const K = await sha256Bytes(new TextEncoder().encode(PURINE_MAC_SALT));
+  const canonical = canonicalJson(tokenWithoutMac);
+  let innerKey;
+  if (window.crypto && crypto.subtle) {
+    innerKey = await crypto.subtle.importKey('raw', K, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+    const innerBuf = await crypto.subtle.sign('HMAC', innerKey, new TextEncoder().encode(canonical));
+    const innerHex = bufToHex(innerBuf);
+    const outerBuf = await crypto.subtle.sign('HMAC', innerKey, new TextEncoder().encode(innerHex + '|' + code));
+    return bufToHex(outerBuf);
+  }
+  // Electron 降级：Node crypto
+  try {
+    const c = window.require && window.require('crypto');
+    if (c) {
+      const Kbuf = Buffer.from(new Uint8Array(K));
+      const inner = c.createHmac('sha256', Kbuf).update(canonical, 'utf8').digest('hex');
+      return c.createHmac('sha256', Kbuf).update(inner + '|' + code, 'utf8').digest('hex');
+    }
+  } catch (e) {}
+  return null;
+}
+
+/* 旧版单级 MAC（长码兼容）：sha256(规范token串(不含mac) + 盐) */
+async function computeMacLegacy(tokenWithoutMac) {
+  const canonical = canonicalJson(tokenWithoutMac);
+  const bytes = new TextEncoder().encode(canonical + PURINE_MAC_SALT);
+  return await sha256Hex(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
+}
+/* sha256Bytes：返回 ArrayBuffer */
+async function sha256Bytes(data) {
+  if (window.crypto && crypto.subtle) return await crypto.subtle.digest('SHA-256', data);
+  try {
+    const c = window.require && window.require('crypto');
+    if (c) return c.createHash('sha256').update(Buffer.from(data)).digest().buffer;
+  } catch (e) {}
+  return new ArrayBuffer(0);
+}
+
+/* 一次性密钥指纹：用 v+u/data+h 规范串，改末尾补位字符不影响指纹 */
+function getKeyFingerprint(token) {
+  return [token.v, token.u || token.data || '', token.h].join('|');
+}
 
 async function sha256Hex(buf) {
   // 优先 Web Crypto
@@ -517,24 +714,140 @@ async function sha256Hex(buf) {
   return null;
 }
 
-async function applyUpdateKey() {
-  const raw = ($('#updateKey').value || '').trim();
-  if (!raw) { alert('请输入更新密钥'); return; }
-  if (!raw.startsWith('PUR-')) { alert('密钥格式错误：应以 PUR- 开头'); return; }
+/* 更新进度提示（写入通道②结果区） */
+function setProgress(msg) {
+  const el = $('#updateResult');
+  if (!el) return;
+  el.innerHTML = msg ? '<div class="upgrade-progress">' + escapeHtml(msg) + '</div>' : '';
+}
+
+/* 短码路径：从托管索引拉 token，两级 HMAC 校验，设备级一次性 */
+async function handleShortCode(code) {
+  setProgress('正在校验更新码…');
+  // a) 设备级一次性：used_codes
+  const codeBuf = await sha256Bytes(new TextEncoder().encode(code));
+  const codeHash = bufToHex(codeBuf);
+  const usedCodes = LS.get('used_codes', []);
+  if (usedCodes.includes(codeHash)) { setProgress('❌ 该码已在本设备使用过'); return; }
+
+  // b) 拉取索引
+  const f = await codeHashPrefix(code);
   let token;
-  try { token = JSON.parse(b64urlDecode(raw.slice(4))); }
-  catch (e) { alert('密钥解析失败：base64url 不是合法 JSON'); return; }
+  try {
+    const resp = await fetch(appBase() + '/keys/' + f + '.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!resp.ok) { setProgress('❌ 未找到该更新码（可能已过期或输入错误）'); return; }
+    token = await resp.json();
+  } catch (e) { setProgress('❌ 无法获取更新索引：' + e.message); return; }
+
+  // c) 两级 HMAC 校验
+  if (!token.mac) { setProgress('❌ 索引文件缺少签名，拒绝'); return; }
+  const { mac, ...rest } = token;
+  const expectedMac = await computeMac(rest, code);
+  if (!expectedMac || String(mac).toLowerCase() !== expectedMac.toLowerCase()) {
+    setProgress('❌ 更新码签名校验失败，可能已被篡改'); return;
+  }
+
+  // d) 基本校验
+  if (!token.v) { setProgress('❌ 索引缺少版本号'); return; }
+  if (token.exp && token.exp < todayStr()) { setProgress('❌ 更新码已过期（' + token.exp + '）'); return; }
+  const isFull = token.type === 'full';
+  const curVer = isFull ? APP_VERSION : DB.db_version;
+  if (cmpVer(token.v, curVer) <= 0) { setProgress('已是最新（当前 ' + curVer + '）'); return; }
+
+  // e) 设备级一次性：used_types
+  const typeFp = token.v + '|' + (token.u ? 'data' : 'offline') + '|' + token.h;
+  const usedTypes = LS.get('used_types', []);
+  if (usedTypes.includes(typeFp)) { setProgress('❌ 本设备已使用过该类型的更新码（数据版本相同）'); return; }
+
+  // f) 下载数据
+  let newDB = null;
+  if (token.data) {
+    try {
+      const bin = b64ToBytes(token.data);
+      const jsonBytes = pako.ungzip(bin);
+      newDB = JSON.parse(new TextDecoder('utf-8').decode(jsonBytes));
+    } catch (e) { setProgress('❌ 离线包解压失败：' + e.message); return; }
+  } else {
+    setProgress('正在下载数据…');
+    const dataUrl = isFull ? token.u.replace(/\/$/, '') + '/data/purine-db.json' : token.u;
+    try {
+      const resp = await fetch(dataUrl, { cache: 'no-store' });
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const buf = await resp.arrayBuffer();
+      const hex = await sha256Hex(buf);
+      if (hex && hex.toLowerCase() !== String(token.h).toLowerCase()) { setProgress('❌ 文件校验失败：哈希不匹配'); return; }
+      newDB = JSON.parse(new TextDecoder('utf-8').decode(buf));
+    } catch (e) { setProgress('❌ 下载失败：' + e.message); return; }
+  }
+  if (!newDB || !newDB.items || !newDB.items.length) { setProgress('❌ 数据结构不正确'); return; }
+
+  // g) type=full：下载 UI 代码
+  if (isFull) {
+    setProgress('正在更新界面代码…');
+    try {
+      const cache = await caches.open('purine-app-' + APP_VERSION);
+      for (const f2 of ['app.js', 'style.css', 'index.html', 'sw.js']) {
+        const r = await fetch(token.u.replace(/\/$/, '') + '/' + f2, { cache: 'no-store' });
+        if (r.ok) await cache.put(token.u.replace(/\/$/, '') + '/' + f2, r);
+      }
+    } catch (e) {}
+  }
+
+  // h) 写入并标记
+  LS.set('db_override', newDB);
+  usedCodes.push(codeHash); LS.set('used_codes', usedCodes);
+  usedTypes.push(typeFp); LS.set('used_types', usedTypes);
+  setProgress('✅ 更新成功！v' + newDB.db_version + '，共 ' + newDB.items.length + ' 条。即将刷新…');
+  setTimeout(() => location.reload(), 1200);
+}
+async function applyUpdateKey() {
+  const raw = ($('#updateKey').value || $('#shortCodeInput').value || '').trim();
+  if (!raw) { setProgress('请输入更新码或密钥'); return; }
+  const norm = normalizeInput(raw);
+  if (norm.mode === 'short') { await handleShortCode(norm.code); return; }
+  if (norm.mode === 'unknown') { setProgress('❌ 无法识别的输入格式'); return; }
+  // 长码路径
+  const payload = raw.slice(4);
+  // 安全修复①：base64url 往返校验——任何字符改动（含末尾补位区）都会导致重编码不匹配
+  let decodedBytes = null;
+  try { decodedBytes = b64ToBytes(payload); }
+  catch (e) { setProgress('❌ 密钥无效：base64url 解码失败'); return; }
+  const reEncoded = b64urlEncode(decodedBytes);
+  if (reEncoded !== payload) {
+    setProgress('❌ 密钥无效或已被篡改（编码往返校验失败）');
+    return;
+  }
+  let token;
+  try { token = JSON.parse(new TextDecoder('utf-8').decode(decodedBytes)); }
+  catch (e) { setProgress('❌ 密钥解析失败：不是合法 JSON'); return; }
 
   // 校验必填字段
-  if (!token.v) { alert('密钥缺少版本号 v'); return; }
+  if (!token.v) { setProgress('❌ 密钥缺少版本号 v'); return; }
   const hasOnline = !!token.u;
   const hasOffline = !!token.data;
-  if (!hasOnline && !hasOffline) { alert('密钥既无下载地址 u 也无离线数据 data，无法更新'); return; }
-  if (!token.h) { alert('密钥缺少哈希 h'); return; }
-  if (token.exp && token.exp < todayStr()) { alert('密钥已过期（' + token.exp + '）'); return; }
-  if (cmpVer(token.v, DB.db_version) <= 0) { alert('已是最新或更新版本不高于当前（当前 ' + DB.db_version + '）'); return; }
+  if (!hasOnline && !hasOffline) { setProgress('❌ 密钥既无下载地址 u 也无离线数据 data，无法更新'); return; }
+  if (!token.h) { setProgress('❌ 密钥缺少哈希 h'); return; }
+  if (token.exp && token.exp < todayStr()) { setProgress('❌ 密钥已过期（' + token.exp + '）'); return; }
+
+  // 长码路径：单级 MAC（与上一版一致）；无 mac 旧格式跳过
+  if (token.mac) {
+    const { mac, ...rest } = token;
+    const expectedMac = await computeMacLegacy(rest);
+    if (!expectedMac || String(mac).toLowerCase() !== expectedMac.toLowerCase()) {
+      setProgress('❌ 密钥签名校验失败，可能已被篡改');
+      return;
+    }
+  }
+
+  // type=full 比对应用版本，否则比对数据版本
+  const isFull = token.type === 'full';
+  const curVer = isFull ? APP_VERSION : DB.db_version;
+  if (cmpVer(token.v, curVer) <= 0) { setProgress('已是最新或更新版本不高于当前（当前 ' + curVer + '）'); return; }
+
+  // 安全修复③：一次性去重改用规范指纹（v|u/data|h），改末尾字符不绕过
   const used = LS.get('used_keys', []);
-  if (used.includes(raw)) { alert('该密钥已在本设备使用过'); return; }
+  const fp = getKeyFingerprint(token);
+  if (used.includes(fp)) { setProgress('该密钥已在本设备使用过'); return; }
 
   let newDB = null;
   if (hasOffline) {
@@ -546,23 +859,57 @@ async function applyUpdateKey() {
       newDB = JSON.parse(text);
     } catch (e) { alert('离线包解压失败：' + e.message); return; }
   } else {
-    // 通道②：在线下载
-    alert('正在下载新数据库…');
+    // 通道②：在线下载。type=full 时 u 是应用根地址；type=data（默认）时 u 是单个 JSON 文件
+    const isFull = token.type === 'full';
+    const dataUrl = isFull ? token.u.replace(/\/$/, '') + '/data/purine-db.json' : token.u;
+    setProgress('正在下载数据…');
     let buf;
     try {
-      const resp = await fetch(token.u);
+      const resp = await fetch(dataUrl, { cache: 'no-store' });
       if (!resp.ok) throw new Error('HTTP ' + resp.status);
       buf = await resp.arrayBuffer();
-    } catch (e) { alert('下载失败：' + e.message + '\n（需联网，且服务器允许跨域）'); return; }
-    // 计算 SHA-256 比对
+    } catch (e) { setProgress(''); alert('下载失败：' + e.message + '\n（需联网，且服务器允许跨域）'); return; }
+    // 计算 SHA-256 比对（h 始终是 purine-db.json 的哈希）
     const hex = await sha256Hex(buf);
     if (hex && hex.toLowerCase() !== String(token.h).toLowerCase()) {
+      setProgress('');
       alert('文件校验失败：SHA-256 不匹配。\n期望: ' + token.h + '\n实际: ' + hex);
       return;
     }
-    if (!hex) { if (!confirm('当前环境无法计算 SHA-256（非安全上下文），跳过完整性校验？')) return; }
+    if (!hex) { if (!confirm('当前环境无法计算 SHA-256（非安全上下文），跳过完整性校验？')) { setProgress(''); return; } }
     try { newDB = JSON.parse(new TextDecoder('utf-8').decode(buf)); }
-    catch (e) { alert('下载的不是合法 JSON'); return; }
+    catch (e) { setProgress(''); alert('下载的不是合法 JSON'); return; }
+
+    // type=full：额外下载 UI 代码文件并写入 SW 缓存
+    if (isFull) {
+      setProgress('正在更新界面代码…');
+      const base = token.u.replace(/\/$/, '');
+      const codeFiles = ['app.js', 'style.css', 'index.html', 'sw.js'];
+      let codeOk = true;
+      try {
+        const cacheName = 'purine-app-' + APP_VERSION;
+        const cache = await caches.open(cacheName);
+        for (const f of codeFiles) {
+          try {
+            const r = await fetch(base + '/' + f, { cache: 'no-store' });
+            if (r.ok) await cache.put(base + '/' + f, r);
+            else codeOk = false;
+          } catch (e) { codeOk = false; }
+        }
+        if (navigator.serviceWorker) navigator.serviceWorker.register('sw.js').catch(() => {});
+      } catch (e) { codeOk = false; }
+      // 数据已写入，无论代码是否成功都继续；刷新后由 SW 自动接管新缓存
+      LS.set('db_override', newDB);
+      used.push(raw); LS.set('used_keys', used);
+      if (codeOk) {
+        setProgress('完成，即将刷新…');
+        setTimeout(() => location.reload(), 1500);
+      } else {
+        alert('数据已更新到 v' + newDB.db_version + '，但 UI 代码下载失败。\n请联网后再次使用密钥更新，或手动刷新页面。');
+        setProgress('');
+      }
+      return;
+    }
   }
 
   // 离线包也要校验解压后 JSON 的 SHA-256
@@ -587,9 +934,9 @@ async function applyUpdateKey() {
   if (!newDB.items || !newDB.items.length) { alert('数据库结构不正确'); return; }
 
   LS.set('db_override', newDB);
-  used.push(raw); LS.set('used_keys', used);
-  alert('更新成功！已升级到 v' + newDB.db_version + '，共 ' + newDB.items.length + ' 条。即将刷新。');
-  location.reload();
+  used.push(fp); LS.set('used_keys', used);
+  setProgress('✅ 更新成功！已升级到 v' + newDB.db_version + '，共 ' + newDB.items.length + ' 条。即将刷新…');
+  setTimeout(() => location.reload(), 1200);
 }
 
 // base64（含 base64url）字符串 → Uint8Array
@@ -624,18 +971,51 @@ function importFile(file) {
 }
 
 /* ---------------- 17. 密钥生成器（桌面端） ---------------- */
-let kgMode = 'online'; // 'online' | 'offline'
+let kgMode = 'short'; // 'short' | 'online' | 'offline'
+let lastShortCode = '';   // 最近生成的短码
+let lastIndexData = null; // 最近生成的索引 JSON（用于导出 keys/<f>.json）
 
 async function genKey() {
   const url = $('#kgUrl').value.trim();
   const exp = $('#kgExp').value;
   const notes = $('#kgNotes').value.trim();
+  const type = $('#kgType').value; // 'data' | 'full'
   if (!exp) { alert('请选择过期日期'); return; }
-  if (kgMode === 'online' && !url) { alert('在线模式需输入下载地址 URL'); return; }
-  const v = DB.db_version;
+  if ((kgMode === 'online' || kgMode === 'short') && !url) { alert('短码/在线模式需输入应用托管根地址'); return; }
+  const v = type === 'full' ? APP_VERSION : DB.db_version;
+
+  // ===== 短码模式：生成 16 位码 + 两级 HMAC + 索引 JSON =====
+  if (kgMode === 'short') {
+    // 生成 16 位随机码
+    const rand = new Uint8Array(16);
+    crypto.getRandomValues(rand);
+    let code = '';
+    for (let i = 0; i < 16; i++) code += CODE_ALPHABET[rand[i] % CODE_ALPHABET.length];
+    lastShortCode = code;
+    // 计算数据库哈希
+    let h = null;
+    try { const r = await fetch('data/purine-db.json'); if (r.ok) { const b = await r.arrayBuffer(); h = await sha256Hex(b); } } catch (e) {}
+    if (!h) { const b = new TextEncoder().encode(JSON.stringify(DB)); h = await sha256Hex(b); }
+    // token（不含 mac）
+    const token = { v: v, u: url.replace(/\/$/, ''), h: h, exp: exp, iat: todayStr(), typ: 'purine-update', notes: notes };
+    if (type === 'full') token.type = 'full';
+    // 两级 HMAC
+    token.mac = await computeMac(token, code);
+    lastIndexData = token;
+    const f = await codeHashPrefix(code);
+    const formatted = code.match(/.{1,4}/g).join('-');
+    $('#kgResultCard').style.display = '';
+    $('#kgOutput').value = formatted;
+    $('#kgMeta').innerHTML =
+      '<div>更新码：<b style="font-size:18px;letter-spacing:1px">' + formatted + '</b></div>' +
+      '<div>升级类型：<b>' + (type === 'full' ? '完整升级（数据+UI）' : '仅数据') + '</b></div>' +
+      '<div>目标版本：<b>v' + escapeHtml(v) + '</b></div>' +
+      '<div>索引文件名：<code>keys/' + f + '.json</code></div>' +
+      '<div style="color:#e07b24;font-size:12px;margin-top:6px">请将下方导出的索引文件上传到托管地址的 keys/ 目录，并把 16 位更新码发给用户。</div>';
+    return;
+  }
 
   if (kgMode === 'online') {
-    // 通道②：读取原始 JSON 文件算哈希（与 CDN 上传文件一致）
     let h = null, usedRaw = false;
     try {
       const resp = await fetch('data/purine-db.json');
@@ -647,12 +1027,16 @@ async function genKey() {
     }
     if (!h) { alert('当前环境无法计算 SHA-256'); return; }
     const token = { v: v, u: url, h: h, exp: exp, notes: notes };
-    const encoded = b64urlEncode(new TextEncoder().encode(JSON.stringify(token)));
+    if (type === 'full') token.type = 'full';
+    // 长码单级 MAC（与 Python 脚本一致）
+    token.mac = await computeMacLegacy(token);
+    const encoded = b64urlEncode(new TextEncoder().encode(canonicalJson(token)));
     $('#kgResultCard').style.display = '';
     $('#kgOutput').value = 'PUR-' + encoded;
     $('#kgMeta').innerHTML =
-      '<div>目标版本：<b>v' + escapeHtml(v) + '</b></div>' +
-      '<div>SHA-256：<code>' + h + '</code></div>' +
+      '<div>升级类型：<b>' + (type === 'full' ? '完整升级（数据+UI代码）' : '仅数据') + '</b></div>' +
+      '<div>目标版本：<b>v' + escapeHtml(v) + '</b>' + (type === 'full' ? '（应用版本）' : '（数据版本）') + '</div>' +
+      '<div>数据库 SHA-256：<code>' + h + '</code></div>' +
       '<div style="color:' + (usedRaw ? '#2e7d5b' : '#e07b24') + ';font-size:12px">' +
       (usedRaw ? '已对 web/data/purine-db.json 原始文件计算哈希。' : 'file:// 下降级为内存序列化哈希，请在 http 服务下使用。') + '</div>';
   } else {
@@ -664,7 +1048,8 @@ async function genKey() {
       const gz = pako.gzip(rawBytes);
       const b64 = bytesToB64(gz);
       const token = { v: v, h: h, exp: exp, data: b64, notes: notes || ('离线更新包 v' + v) };
-      const encoded = b64urlEncode(new TextEncoder().encode(JSON.stringify(token)));
+      token.mac = await computeMacLegacy(token);
+      const encoded = b64urlEncode(new TextEncoder().encode(canonicalJson(token)));
       $('#kgResultCard').style.display = '';
       $('#kgOutput').value = 'PUR-' + encoded;
       $('#kgMeta').innerHTML =
@@ -851,17 +1236,36 @@ let scanTimer = null;
 async function startScan() {
   $('#scannerBox').style.display = '';
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    alert('当前环境无法访问摄像头，请改用"选择二维码图片"。');
+    setProgress('当前环境无法访问摄像头，请改用下方"选择二维码图片"。');
     return;
   }
   try {
     scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
     const video = $('#qrVideo');
+    // PWA 添加到主屏幕后必须 muted + playsinline 才能自动播放摄像头画面
+    video.muted = true;
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+    video.setAttribute('x5-playsinline', '');
     video.srcObject = scanStream;
     await video.play();
     scanTimer = setInterval(tickScan, 300);
-  } catch (e) {
-    alert('摄像头开启失败：' + e.message + '\n可改用下方"选择二维码图片"。');
+    // 自检：500ms 后画面仍未渲染则友好提示
+    setTimeout(() => {
+      if (video.videoWidth > 0) {
+        console.log('摄像头画面正常', video.videoWidth + 'x' + video.videoHeight);
+      } else {
+        setProgress('摄像头画面未渲染，请尝试改用下方"选择二维码图片"。');
+      }
+    }, 500);
+  } catch (err) {
+    if (err.name === 'NotAllowedError' || err.name === 'SecurityError') {
+      setProgress('摄像头权限被拒绝。请在浏览器/系统设置中允许本应用使用摄像头，或改用下方"选择二维码图片"扫码。');
+    } else if (err.name === 'NotFoundError' || err.name === 'OverconstrainedError') {
+      setProgress('未检测到可用摄像头设备，请改用下方"选择二维码图片"扫码。');
+    } else {
+      setProgress('摄像头启动失败（' + (err.name || 'Error') + '），请改用下方"选择二维码图片"扫码。');
+    }
   }
 }
 
@@ -878,6 +1282,7 @@ function tickScan() {
     if (code && code.data) {
       stopScan();
       $('#updateKey').value = code.data.trim();
+      setProgress('✅ 识别成功，正在更新…');
       applyUpdateKey();
     }
   } catch (e) {}
@@ -885,8 +1290,13 @@ function tickScan() {
 
 function stopScan() {
   if (scanTimer) { clearInterval(scanTimer); scanTimer = null; }
+  const video = $('#qrVideo');
+  // 彻底释放摄像头轨道，关闭指示灯
+  if (video && video.srcObject) {
+    video.srcObject.getTracks().forEach(t => t.stop());
+    video.srcObject = null;
+  }
   if (scanStream) { scanStream.getTracks().forEach(t => t.stop()); scanStream = null; }
-  $('#qrVideo').srcObject = null;
   $('#scannerBox').style.display = 'none';
 }
 
@@ -904,6 +1314,7 @@ function scanImageFile(file) {
         const code = jsQR(data.data, c.width, c.height);
         if (code && code.data) {
           $('#updateKey').value = code.data.trim();
+          setProgress('✅ 识别成功，正在更新…');
           applyUpdateKey();
         } else { alert('未识别到二维码'); }
       } catch (e) { alert('识别失败：' + e.message); }
@@ -1082,6 +1493,14 @@ function bindEvents() {
 
   // 更新密钥
   $('#applyKey').addEventListener('click', applyUpdateKey);
+  // 通道③：应用离线包密钥按钮
+  const _aok = document.getElementById('applyOfflineKey');
+  if (_aok) _aok.addEventListener('click', function() {
+    const raw = (document.getElementById('updateKey').value || '').trim();
+    if (!raw) { setProgress('请先粘贴离线包密钥'); return; }
+    if (!raw.startsWith('PUR-')) { setProgress('离线包密钥应以 PUR- 开头'); return; }
+    applyUpdateKey();
+  });
   $('#offlineFile').addEventListener('change', e => { if (e.target.files[0]) importOfflineFile(e.target.files[0]); });
 
   // 通道①
@@ -1098,11 +1517,28 @@ function bindEvents() {
     const s = e.target.closest('.seg'); if (!s) return;
     kgMode = s.dataset.mode;
     $all('#kgMode .seg').forEach(x => x.classList.toggle('active', x === s));
-    const isOnline = kgMode === 'online';
-    $('#kgUrlLabel').style.display = isOnline ? '' : 'none';
-    $('#kgModeHint').textContent = isOnline
-      ? '在线模式：密钥含下载地址，手机端扫码后需联网拉取更新包。'
-      : '离线模式：gzip 压缩整个数据库内嵌进密钥，无需联网，但密钥极长（不适合二维码）。';
+    const needUrl = (kgMode === 'online' || kgMode === 'short');
+    $('#kgUrlLabel').style.display = needUrl ? '' : 'none';
+    $('#kgModeHint').textContent =
+      kgMode === 'short' ? '短码模式：生成 16 位码，需将索引文件上传到托管地址 keys/ 目录。'
+      : kgMode === 'online' ? '长码模式：密钥含下载地址，手机端输入 PUR- 后联网拉取。'
+      : '离线模式：gzip 压缩整个数据库内嵌进密钥，无需联网，但密钥极长。';
+  });
+  // 短码输入自动格式化（每4位加连字符，只保留字母表字符）
+  $('#shortCodeInput').addEventListener('input', e => {
+    let v = e.target.value.toUpperCase().replace(/[^A-Z2-9]/g, '').slice(0, 16);
+    e.target.value = v.match(/.{1,4}/g) ? v.match(/.{1,4}/g).join('-') : '';
+  });
+  // 导出索引文件 keys/<f>.json
+  $('#exportIndex').addEventListener('click', async () => {
+    if (!lastIndexData) { alert('请先生成更新码'); return; }
+    const f = await codeHashPrefix(lastShortCode);
+    const blob = new Blob([JSON.stringify(lastIndexData, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = f + '.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
   });
   $('#genQr').addEventListener('click', () => {
     const k = $('#kgOutput').value.trim();
@@ -1125,20 +1561,40 @@ function bindEvents() {
   $('#adminClearForm').addEventListener('click', () => fillForm(null));
   $('#adminExport').addEventListener('click', exportNewVersion);
 
-  // 知识库卡片 → 文章列表
-  $('#knowledgeCards').addEventListener('click', e => {
-    const c = e.target.closest('.kb-card'); if (!c) return;
-    const sec = KNOWLEDGE.sections[parseInt(c.dataset.s, 10)]; if (!sec) return;
-    // 简易文章列表：prompt 换成 confirm 风格 —— 这里用一个简化弹窗：列出文章标题
-    const titles = sec.articles.map((a, i) => (i + 1) + '. ' + a.title).join('\n');
-    const idx = prompt('【' + sec.title + '】选择文章编号（1-' + sec.articles.length + '）：\n' + titles);
-    const n = parseInt(idx, 10) - 1;
-    if (n >= 0 && n < sec.articles.length) {
-      const art = sec.articles[n];
-      $('#aTitle').textContent = art.title;
-      $('#aContent').textContent = art.content;
-      $('#aSources').innerHTML = '参考来源：<ul class="sources-list">' + (art.sources || []).map(s => '<li>' + escapeHtml(s) + '</li>').join('') + '</ul>';
-      openModal('articleModal');
+  // 知识库 Tab：搜索 + 板块导航 + 文章点击
+  $('#kbSearch').addEventListener('input', renderKbPage);
+  $("#kbCat").addEventListener('change', e => {
+    kbCat = e.target.value;
+    kbSubcat = '-1';
+    renderKbPage();
+  });
+  $("#kbSubcat").addEventListener('change', e => {
+    kbSubcat = e.target.value;
+    renderKbPage();
+  });
+  $('#kbBody').addEventListener('click', e => {
+    const li = e.target.closest('li[data-article]'); if (!li) return;
+    const [si, ai] = li.dataset.article.split(':').map(Number);
+    openArticle(si, ai);
+  });
+
+  // 新工具
+  $('#calcBudget').addEventListener('click', calcBudget);
+  $('#calcWater').addEventListener('click', calcWater);
+
+  // 密钥生成器：升级类型切换
+  $('#kgType').addEventListener('change', e => {
+    const t = e.target.value;
+    const hint = $('#kgTypeHint');
+    const lbl = $('#kgUrlLabel');
+    if (t === 'full') {
+      hint.textContent = '完整升级：u 为应用托管根地址（如 https://yanxingshen.github.io/purine-query-web/），将同时更新数据库和 UI 代码。';
+      lbl.childNodes[0].textContent = '应用托管根地址：';
+      $('#kgUrl').placeholder = 'https://example.com/purine-query-web/';
+    } else {
+      hint.textContent = '仅数据更新：u 为单个数据库 JSON 文件地址，手机端拉取后替换数据。';
+      lbl.childNodes[0].textContent = '数据库下载地址 URL：';
+      $('#kgUrl').placeholder = 'https://example.com/purine-db-v1.1.0.json';
     }
   });
 
@@ -1177,6 +1633,7 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#uricDate').value = todayStr();
   renderWater();
   renderUricList();
+  renderKbPage();
   // 密钥生成器默认明天+一年后过期
   const d = new Date(); d.setFullYear(d.getFullYear() + 1);
   $('#kgExp').value = fmtDate(d);

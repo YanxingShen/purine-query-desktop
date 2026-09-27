@@ -1,7 +1,7 @@
 /* Service Worker —— 离线缓存所有静态资源 */
 'use strict';
 
-const CACHE_NAME = 'purine-app-v1.0.2';
+const CACHE_NAME = 'purine-app-v1.0.5';
 const ASSETS = [
   './',
   './index.html',
